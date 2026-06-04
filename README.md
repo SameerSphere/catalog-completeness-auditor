@@ -80,6 +80,12 @@ Anything scoring **below 60** is flagged `needs_fix` and queued for AI rewriting
 
 ## Example output (real run on the sample catalog)
 
+The workflow writes a prioritized **fix queue** — scored listings with AI-generated
+rewrites for the failures. Here's the real output (generated with Groq), formatted
+as it appears in Google Sheets:
+
+![Fix queue output with scores, flags, and AI rewrites](docs/sample-output.png)
+
 Running `node scripts/test-scoring.js` scores every listing and flags the failures:
 
 ```

@@ -35,6 +35,11 @@ Listings under **60** are flagged and queued for an AI rewrite.
 
 *Reproduce with `node scripts/audit.js` — results land in `output/fix_queue.csv`.*
 
+## The output: a prioritized fix queue
+The full scored catalog with AI rewrites, as written to Google Sheets:
+
+![Fix queue output](sample-output.png)
+
 ## Tools used
 n8n (orchestration) · OpenAI gpt-4o-mini (rewriting) · Google Sheets API (output)
 · Gmail (reporting) · JavaScript (scoring logic)
