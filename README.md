@@ -12,6 +12,14 @@ all orchestrated as an automated **n8n** workflow.
 This workflow can be deployed for any **Shopify** or **BigCommerce** store with a
 product export.
 
+## The workflow (built in n8n)
+
+![Catalog Completeness Auditor workflow in n8n](n8n/n8n-workflow.png)
+
+*The end-to-end agentic workflow: a weekly trigger reads a product catalog, scores
+every listing, filters the failures, rewrites them with AI, writes a fix queue to
+Google Sheets, and emails a summary — all orchestrated visually in n8n.*
+
 ---
 
 ## Architecture (n8n-first)

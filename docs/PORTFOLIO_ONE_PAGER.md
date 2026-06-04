@@ -10,34 +10,30 @@ Audits an entire product catalog, scores every listing 0–100 on content qualit
 auto-rewrites the worst with AI, and delivers a prioritized fix queue to Google
 Sheets — on a weekly schedule.
 
-## The pipeline
-```
-Weekly Trigger → Read CSV → Parse → SCORE (5 dimensions) → Filter "needs_fix"
-                                          │                       │
-                                          │                  AI Rewrite (OpenAI)
-                                          │                       │
-                                     Email summary          Google Sheets fix queue
-```
-*(Replace this with a screenshot of the n8n canvas — that's the visual portfolio piece.)*
+## The pipeline (n8n)
+
+![n8n workflow](../n8n/n8n-workflow.png)
+
+*Weekly Trigger → Read CSV → Score (5 dimensions) → Filter "needs_fix" → AI Rewrite
+→ Google Sheets fix queue, with a parallel branch that emails a summary.*
 
 ## Scoring dimensions (20 pts each = 100)
 description length · price present · title quality · category present · readability
 Listings under **60** are flagged and queued for an AI rewrite.
 
-## Before / after example
-**Before** (scored 32/100 — too short, no category):
+## Before / after example (real output, generated with Groq)
+**Before** (scored 32/100 — title too short, no category, thin description):
 > **Title:** Bottle
 > **Description:** Nice bottle.
 
 **After** (AI-rewritten, SEO-optimized):
-> **Title:** Insulated Stainless Steel Water Bottle 1L — Leakproof, 24h Cold
-> **Description:** Stay hydrated anywhere with this 1-liter double-walled
-> stainless steel bottle that keeps drinks cold for 24 hours. Leakproof lid,
-> scratch-resistant finish, BPA-free, and built to fit car cup holders and gym bags.
-> **SEO keywords:** insulated water bottle, stainless steel bottle, leakproof, 1 liter, gym water bottle
+> **Title:** Premium Glass Water Bottle - 27oz Insulated Hydration Container
+> **Description:** Stay refreshed on-the-go with our premium glass water bottle,
+> featuring a 27oz capacity, insulated design, and BPA-free construction for a
+> healthy and sustainable hydration experience.
+> **SEO keywords:** glass water bottle, insulated bottle, hydration container, refillable bottle, eco-friendly bottle
 
-*(Generate your own real example by running `node scripts/audit.js --limit 5`
-once your OpenAI account has credit, then screenshot the Google Sheet.)*
+*Reproduce with `node scripts/audit.js` — results land in `output/fix_queue.csv`.*
 
 ## Tools used
 n8n (orchestration) · OpenAI gpt-4o-mini (rewriting) · Google Sheets API (output)
