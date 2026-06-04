@@ -22,6 +22,25 @@ Google Sheets, and emails a summary — all orchestrated visually in n8n.*
 
 ---
 
+## Who it's for & real-world use cases
+
+This is a packageable service for any agency or in-house team managing an
+ecommerce catalog. Concrete scenarios:
+
+| Use case | What the workflow delivers |
+|----------|----------------------------|
+| **Pre-migration content audit** (e.g. moving to BigCommerce/Shopify) | A scored report of every listing so the team fixes weak content *before* it goes live, not after. |
+| **Weekly catalog QA** | A scheduled health-check that flags new thin/incomplete listings as the catalog grows — no manual review. |
+| **SEO uplift sprint** | A prioritized queue (worst-first) with ready-to-paste AI titles, descriptions, and keywords. |
+| **Supplier / dropship feed cleanup** | Auto-rewrites the typically poor copy that comes from supplier product feeds. |
+| **Recurring client report** | The Google Sheet + "X products need fixing this week" email is a deliverable a service business can bill for monthly. |
+
+**Why it matters commercially:** content quality directly drives conversion and
+SEO ranking. This turns a slow, manual, subjective review into a fast, consistent,
+automated workflow — exactly the "manual → AI-assisted" shift agencies sell.
+
+---
+
 ## Architecture (n8n-first)
 
 ```
@@ -31,7 +50,7 @@ Schedule Trigger (weekly)
 Read CSV  ──► Extract From File ──► Code node: SCORING ──► Filter (score < 60)
                                           │                      │
                                           │                      ▼
-                                          │              OpenAI: REWRITE listing
+                                          │         AI REWRITE (OpenAI or Groq)
                                           │                      │
                                           ▼                      ▼
                                    Google Sheets  ◄──────  Merge results
@@ -56,6 +75,41 @@ team to adapt.
 | `description_readability` | Sentence-length heuristic; penalizes run-ons, fragments, shouting |
 
 Anything scoring **below 60** is flagged `needs_fix` and queued for AI rewriting.
+
+---
+
+## Example output (real run on the sample catalog)
+
+Running `node scripts/test-scoring.js` scores every listing and flags the failures:
+
+```
+id     len  price  title  cat  read  TOTAL  flag       title
+----------------------------------------------------------------------------------------
+P001   12   20     20     20   20    92     ok         Stainless Steel Insulated Water Bottle 1L
+P002   0    20     8      0    4     32     needs_fix  Bottle
+P003   13   20     20     20   20    93     ok         Wireless Bluetooth Over-Ear Headphones...
+P004   0    0      10     20   4     34     needs_fix  CHEAP PHONE CASE BUY NOW!!!
+P008   13   20     20     20   20    93     ok         Smart LED Desk Lamp with USB Charging Port
+P010   0    20     14     20   4     58     needs_fix  GAMING MOUSE RGB 16000 DPI PRO ULTRA...
+
+5 of 12 listings need fixing (score < 60)
+```
+
+Then the flagged listings are rewritten by AI (real output, generated with Groq):
+
+| | Before | After |
+|---|--------|-------|
+| **Title** | `Bottle` | `Premium Glass Water Bottle - 27oz Insulated Hydration Container` |
+| **Description** | `Nice bottle.` | `Stay refreshed on-the-go with our premium glass water bottle, featuring a 27oz capacity, insulated design, and BPA-free construction...` |
+| **SEO keywords** | — | glass water bottle, insulated bottle, hydration container, refillable bottle, eco-friendly bottle |
+
+| | Before | After |
+|---|--------|-------|
+| **Title** | `CHEAP PHONE CASE BUY NOW!!!` | `Durable Protective Phone Case Cover for Mobile Devices` |
+| **SEO keywords** | — | phone case, mobile accessories, protective cover, cell phone case, smartphone accessories |
+
+Each fix lands in `output/fix_queue.csv` (and the Google Sheet), prioritized
+worst-first so a content team knows exactly where to start.
 
 ---
 
@@ -90,7 +144,7 @@ You should see a scored table and a list of listings that need fixing.
 ```bash
 npm run test:scoring     # score the sample CSV, print a table
 npm run audit:mock       # full pipeline with mock AI (no keys)
-node scripts/audit.js --limit 5            # live AI rewrite (needs OPENAI_API_KEY)
+node scripts/audit.js --limit 5            # live AI rewrite (needs a Groq or OpenAI key)
 node scripts/audit.js --mock --sheets      # also write to Google Sheet
 npm run build:n8n        # regenerate the importable n8n workflow
 ```
@@ -99,7 +153,7 @@ npm run build:n8n        # regenerate the importable n8n workflow
 
 | Stage | You provide |
 |-------|-------------|
-| B | OpenAI API key → put in `.env` (see `.env.example`) |
+| B | A free **Groq** key (or OpenAI key) → put in `.env` (see `.env.example`) |
 | C | Google Cloud service account JSON (`google_creds.json`) + a Sheet ID, shared with the service-account email |
 | D | A running n8n (`npx n8n`), and a screenshot of the workflow canvas |
 
