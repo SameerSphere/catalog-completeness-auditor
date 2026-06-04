@@ -1,0 +1,24 @@
+# Secrets & credentials — NEVER commit these
+.env
+.env.local
+google_creds.json
+*-credentials.json
+*service-account*.json
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Data exports (can be large / client-specific)
+data/*.csv
+!data/sample_products.csv
+
+# n8n local runtime
+.n8n/
+
+# OS
+.DS_Store
+
+# Output
+output/
+*.scored.csv

@@ -1,0 +1,21 @@
+{
+  "name": "catalog-completeness-auditor",
+  "version": "0.1.0",
+  "description": "AI-powered product catalog completeness auditor: scores product listings, rewrites the worst with AI, and pushes a prioritized fix queue to Google Sheets. Orchestrated with n8n.",
+  "type": "module",
+  "scripts": {
+    "test:scoring": "node scripts/test-scoring.js",
+    "audit": "node scripts/audit.js",
+    "audit:mock": "node scripts/audit.js --mock",
+    "build:n8n": "node scripts/build-n8n-workflow.js"
+  },
+  "keywords": [
+    "ecommerce",
+    "n8n",
+    "openai",
+    "product-content",
+    "seo",
+    "audit"
+  ],
+  "license": "MIT"
+}
